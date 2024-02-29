@@ -1,9 +1,9 @@
 //
 // Created by stellaura on 29/02/24.
 //
+#include "catch2/catch_all.hpp"
 #include "fmt/format.h"
 #include "logic_simulator_.h"
- #include "catch2/catch_all.hpp"
 
 // int main() {
 TEST_CASE("test for jyy example") {
@@ -60,12 +60,11 @@ TEST_CASE("test for jyy example") {
     start_simulation(flip_flop_devices, gate_devices, print_func);
 }
 
-TEST_CASE("test for the 0-7 clock circuit which I designed"){
+TEST_CASE("test for the 0-7 clock circuit which I designed") {
     // 初始化
     // 核心部分
     // 输出电路
     // 放入容器
     // 定义执行函数
     // 执行
-
 }

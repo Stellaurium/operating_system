@@ -13,6 +13,8 @@ CMakeUserPresets.json
 *.txt
 !conanfile.txt
 !README.md
+!CMakeLists.txt
+
 
 # 其它通常需要被忽略的文件和目录
 # 例如，编辑器生成的临时文件，操作系统生成的文件等

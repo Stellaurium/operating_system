@@ -1,0 +1,20 @@
+project(logisim)
+
+# 获取当前文件夹的名称 然后放到build/bin目录下面的对应文件夹里面
+get_filename_component(CURRENT_FOLDER_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+set(EXECUTABLE_OUTPUT_PATH ${ROOT_EXECUTABLE_OUTPUT_PATH}/${CURRENT_FOLDER_NAME})
+
+# 如果有 设置 sub project 的私有的include的文件夹
+set(SUBPROJECT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${SUBPROJECT_INCLUDE_DIRS})
+
+
+#file(GLOB_RECURSE c_source_files ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
+file(GLOB_RECURSE cpp_source_files ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+set(source_files ${cpp_source_files})
+
+
+add_executable(logisim ${source_files})
+
+target_link_libraries(logisim fmt::fmt)
+target_link_libraries(logisim Catch2::Catch2WithMain)
