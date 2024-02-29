@@ -1,0 +1,21 @@
+# 忽略编译生成的目录
+build/
+cmake-build-debug/
+.vscode/
+.idea/
+
+# 忽略特定的配置文件和目录
+CMakeUserPresets.json
+.clang-format
+
+
+# 忽略所有 .txt 文件，除了 conanfile.txt 和 README.md
+*.txt
+!conanfile.txt
+!README.md
+
+# 其它通常需要被忽略的文件和目录
+# 例如，编辑器生成的临时文件，操作系统生成的文件等
+*.swp
+*~
+.DS_Store
