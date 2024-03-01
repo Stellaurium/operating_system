@@ -8,6 +8,7 @@
 #include "fmt/format.h"
 #include <cassert>
 #include <limits>
+#include <memory>
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
@@ -128,6 +129,16 @@ class Gate : public Device {
     void add_output(Args... args) {
         static_assert((std::is_same_v<Args, Wire *> && ...), "All arguments must be of type Wire*");
         (outputs.push_back(args), ...);
+    }
+
+    // 通过初始化列表 同时添加输入和输出导线
+    void add_both_wire(std::initializer_list<Wire *> input_list, std::initializer_list<Wire *> output_list) {
+        for (auto input : input_list) {
+            inputs.push_back(input);
+        }
+        for (auto output : output_list) {
+            outputs.push_back(output);
+        }
     }
 
     virtual ~Gate() {}
@@ -266,10 +277,24 @@ class NotGate : public Gate {
     }
 };
 
+template <typename Container>
+concept IterableContainer = requires(Container c) {
+    { std::begin(c) } -> std::forward_iterator;
+    { std::end(c) } -> std::forward_iterator;
+};
+
+template <typename Container>
+concept DevicePointerContainer = IterableContainer<Container> && requires {
+    typename Container::value_type;
+    requires std::same_as<typename Container::value_type, Device *> ||
+                 std::same_as<typename Container::value_type, std::unique_ptr<Device>>;
+};
+
 // 执行函数 模拟执行电路
-template <typename Func>
-    requires std::is_invocable_v<Func> && std::same_as<std::invoke_result_t<Func>, void>
-void start_simulation(std::vector<Device *> &flip_flop_devices, std::vector<Device *> &gate_devices, Func func,
+template <typename FlipFlopContainer, typename GateContainer, typename Func>
+    requires std::is_invocable_v<Func> && std::same_as<std::invoke_result_t<Func>, void> &&
+             DevicePointerContainer<FlipFlopContainer> && DevicePointerContainer<GateContainer>
+void start_simulation(FlipFlopContainer &flip_flop_devices, GateContainer &gate_devices, Func func,
                       std::size_t second_sleep = 1,
                       std::size_t max_iter_times = std::numeric_limits<std::size_t>::max() - 1) {
     bool anyUpdated = false;
@@ -294,6 +319,16 @@ void start_simulation(std::vector<Device *> &flip_flop_devices, std::vector<Devi
         sleep(second_sleep);
         max_iter++;
     }
+}
+
+// 添加代码 可以直接构建 制定门电路的 unique_pointer
+template <typename T>
+    requires std::is_base_of_v<Gate, std::remove_cv_t<std::remove_reference_t<T>>>
+std::unique_ptr<std::remove_cv_t<std::remove_reference_t<T>>> make_gate(std::initializer_list<Wire *> input_list,
+                                                                        std::initializer_list<Wire *> output_list) {
+    auto ptr = std::make_unique<std::remove_cv_t<std::remove_reference_t<T>>>();
+    ptr->add_both_wire(input_list, output_list);
+    return ptr; // 直接返回ptr，不需要std::move
 }
 
 #endif //_LOGIC_SIMULATOR__H_
