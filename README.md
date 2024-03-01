@@ -6,6 +6,8 @@
 
 已经是三周目了。现在正好是2024的春天，与课程进度同步。希望能够好好学完，至少学完并发。
 
+本项目使用 Ubuntu 22.04LTS 开发。
+
 ## 对于代码下载
 
 点击 课程ppt界面(vscode类似的前端课程界面)
@@ -23,27 +25,39 @@
 7. 所以需要lcd不停切换，不停创建新的文件夹，然后再下载文件夹
 8. 至少上面的流程可用
 
+~~直接wget要么无限循环 要么卡住~~
+
 ## 项目格式
 
 `~/Programs/course/operating_system/operating_system_jyy_base`: 原始的ftp根目录结构 原始文件 没有任何修改
 
 `~/Programs/course/operating_system/operating_system_jyy`: 自己拿回来重新写的项目 使用 cmake + c++
 
-因为项目里面 什么代码都有,c/python等，还是从c++里面拿了出来
-
 ## 目录结构
 
-目前的想法是： src里面存放各种各样的小项目(例如 电路模拟器，递归等项目) 每个项目一个文件夹
+projects 目录里存放各种小项目，就是课上下载下来的每一个项目
 
-然后文件夹里面一个cmake，用于该文件自己的编译
+每个小项目里面有src和include，可能会有CMakeLists.txt，如果没有就是不需要编译
 
-整个项目的根目录下有一个cmake 管理包的导入等
+这个小项目里面的include是项目独占的，而根目录下的include是所有小项目共享的
 
-最后的结果就是 所有的小项目被编译到根目录中build的对应的文件夹里面
+根目录下的CMakeLists.txt负责初始化一些变量，然后逐一调用每个小项目里面的CMakeLists.txt，分离每个项目的编译方式。
 
-同时 cmake 还可以有类似 make里面 make clear之类的命令
+整个项目的根目录下的 conanfile.txt 负责管理包的导入等
 
-(现在还不会上面的cmake怎么写 然后顺带学了cmake)
+## 构建方式
+
+首先在根目录 `mkdir build` 存放所有的编译过程中的临时文件，`build/bin`里面存放所有的二进制文件，每个小项目会在`build/bin`里面创建一个新的文件夹，名称为其自己的文件夹名称。`cd build`然后进入。
+
+`conan install .. --build=missing` 执行conan的安装。安装完成后，会生成`./Debug/generators/conan_toolchain.cmake`用于后续cmake的执行。
+
+` cmake .. -DCMAKE_TOOLCHAIN_FILE=./Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles"` 执行cmake，获得makefile。
+
+`cmake --build .` 编译
+
+然后可以使用 `make run_<mimi_project_name>`执行相应的mini project。(尽量支持)
+
+
 
 ## 项目依赖
 
