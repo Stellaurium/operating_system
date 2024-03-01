@@ -68,7 +68,6 @@ void eight_numbers_example() {
     std::vector<std::unique_ptr<Device>> flip_flop_devices;
     std::vector<std::unique_ptr<Device>> gate_devices;
 
-    // 核心部分
     // 核心导线
     Wire line[10];
     // 触发器
@@ -76,7 +75,7 @@ void eight_numbers_example() {
     flip_flop_devices.push_back(std::make_unique<DFlipFlop>(&line[2], &line[3]));
     flip_flop_devices.push_back(std::make_unique<DFlipFlop>(&line[7], &line[6]));
     // 门电路
-    // 优雅的直接放入类型
+    // 优雅的传参方式
     gate_devices.push_back(make_gate<NotGate>({&line[1]}, {&line[0]}));
     gate_devices.push_back(make_gate<XorGate>({&line[1], &line[3]}, {&line[2]}));
     gate_devices.push_back(make_gate<NotGate>({&line[3]}, {&line[4]}));
@@ -86,10 +85,11 @@ void eight_numbers_example() {
     gate_devices.push_back(make_gate<OrGate>({&line[5], &line[8]}, {&line[7]}));
 
     // 输出电路
-    // 先不设置任何输出电路 仅仅是检测程序是否正常运行
     Wire &q1{line[1]};
     Wire &q2{line[3]};
     Wire &q3{line[6]};
+
+    // bool表达式化简的网站 https://tma.main.jp/logic/index_en.html
     // ~a~c + ac + b
     Monitor a{[&]() { return q2 || !(q1 ^ q3); }};
     // ~b~c + bc + ~a

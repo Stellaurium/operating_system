@@ -31,7 +31,7 @@ class Wire {
     Wire operator^(const Wire &right) const { return Wire(this->signal != right.signal); }
 };
 
-// 支持fotmat的格式化 以及打印
+// Wire 的fotmat的格式化
 template <>
 struct fmt::formatter<Wire> : fmt::formatter<int> {
     // 使用基础类型 bool 的格式化器作为基础
@@ -328,7 +328,7 @@ void start_simulation(FlipFlopContainer &flip_flop_devices, GateContainer &gate_
     }
 }
 
-// 添加代码 可以直接构建 制定门电路的 unique_pointer
+// 可以直接构建 获得门电路的 unique_pointer
 template <typename T>
     requires std::is_base_of_v<Gate, std::remove_cv_t<std::remove_reference_t<T>>>
 std::unique_ptr<std::remove_cv_t<std::remove_reference_t<T>>> make_gate(std::initializer_list<Wire *> input_list,
