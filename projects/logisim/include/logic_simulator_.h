@@ -7,9 +7,11 @@
 
 #include "fmt/format.h"
 #include <cassert>
+#include <chrono>
 #include <limits>
 #include <memory>
 #include <stdexcept>
+#include <thread>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -302,7 +304,7 @@ template <typename FlipFlopContainer, typename GateContainer, typename Func>
     requires std::is_invocable_v<Func> && std::same_as<std::invoke_result_t<Func>, void> &&
              DevicePointerContainer<FlipFlopContainer> && DevicePointerContainer<GateContainer>
 void start_simulation(FlipFlopContainer &flip_flop_devices, GateContainer &gate_devices, Func func,
-                      std::size_t second_sleep = 1,
+                      std::size_t millisecond = 1000,
                       std::size_t max_iter_times = std::numeric_limits<std::size_t>::max() - 1) {
     bool anyUpdated = false;
     std::size_t max_iter;
@@ -323,7 +325,7 @@ void start_simulation(FlipFlopContainer &flip_flop_devices, GateContainer &gate_
             }
         } while (anyUpdated);
         func();
-        sleep(second_sleep);
+        std::this_thread::sleep_for(std::chrono::milliseconds(millisecond));
         max_iter++;
     }
 }

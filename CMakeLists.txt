@@ -8,6 +8,8 @@ project(operating_system)
 set(PROJECT_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include)
 # 临时变量 为了子cmake继承使用 在子cmake内部再配置保存位置
 set(ROOT_EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/build/bin)
+# python 解释器位置
+set(PYTHON_EXECUTABLE ${PROJECT_SOURCE_DIR}/venv/bin/python)
 
 
 # 寻找库 在构建的时候再链接 (因为有的子项目可能不用)
