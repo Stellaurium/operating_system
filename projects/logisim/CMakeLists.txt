@@ -17,4 +17,4 @@ set(source_files ${cpp_source_files})
 add_executable(logisim ${source_files})
 
 target_link_libraries(logisim fmt::fmt)
-target_link_libraries(logisim Catch2::Catch2WithMain)
+#target_link_libraries(logisim Catch2::Catch2WithMain)

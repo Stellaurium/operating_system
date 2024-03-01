@@ -1,13 +1,12 @@
 //
 // Created by stellaura on 29/02/24.
 //
-#include "catch2/catch_all.hpp"
+// #include "catch2/catch_all.hpp"
 #include "fmt/format.h"
 #include "logic_simulator_.h"
 #include <memory>
 
-// int main() {
-TEST_CASE("test for jyy example","[test]") {
+void jyy_example() {
     //  初始化
 
     // 电路的核心部分
@@ -61,7 +60,7 @@ TEST_CASE("test for jyy example","[test]") {
     start_simulation(flip_flop_devices, gate_devices, print_func);
 }
 
-TEST_CASE("test for the 0-7 clock circuit which I designed","[extend]") {
+void eight_numbers_example() {
     // 初始化
 
     // 容器直接写到最前面 然后往里面放东西就行
@@ -88,15 +87,42 @@ TEST_CASE("test for the 0-7 clock circuit which I designed","[extend]") {
 
     // 输出电路
     // 先不设置任何输出电路 仅仅是检测程序是否正常运行
+    Wire &q1{line[1]};
+    Wire &q2{line[3]};
+    Wire &q3{line[6]};
+    // ~a~c + ac + b
+    Monitor a{[&]() { return q2 || !(q1 ^ q3); }};
+    // ~b~c + bc + ~a
+    Monitor b{[&]() { return !((q3) && (q1 ^ q2)); }};
+    // ~b + c + a
+    Monitor c{[&]() { return q3 || !(q2) || q1; }};
+    // a~bc + ~a~c + ~ab + b~c
+    Monitor d{[&]() { return q3 && !q2 && q1 || !q3 && !q1 || !q3 && q2 || q2 && !q1; }};
+    // ~a~c + b~c
+    Monitor e{[&]() { return !(q1) && (q2 || !(q3)); }};
+    // ~b~c + a~b + a~c
+    Monitor f{[&]() { return (!(q2) && !(q1)) || (q3 && (!(q2) || !(q1))); }};
+    // ~ab + a~b + b~c
+    Monitor g{[&]() { return (q2 ^ q3) || (q2 && !(q1)); }};
 
     // 定义执行函数
     // 每次循环结束要进行的任务
     auto print_func = [&]() {
-        fmt::println("Q3 = {}; Q2 = {}; Q1 = {};", line[6], line[3], line[1]);
+        fmt::println("A = {}; B = {}; C = {}; D = {}; E = {}; F = {}; G = {};", a, b, c, d, e, f, g);
+        //        fmt::println("Q3 = {}; Q2 = {}; Q1 = {};", q3, q2, q1);
         // 一定要刷新以下缓冲区 不然会卡着什么都没有
         fflush(stdout);
     };
 
     // 执行
     start_simulation(flip_flop_devices, gate_devices, print_func);
+}
+
+// TEST_CASE("test for jyy example", "[test]") { jyy_example(); }
+
+// TEST_CASE("test for the 0-7 clock circuit which I designed", "[extend]") { eight_numbers_example(); }
+
+int main() {
+    eight_numbers_example();
+    return 0;
 }

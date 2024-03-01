@@ -11,6 +11,7 @@
 #include <memory>
 #include <stdexcept>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 // 只有一个bool值的导线
@@ -22,6 +23,12 @@ class Wire {
     Wire() : Wire(false){};
     Wire &operator=(const Wire &right) = default;
     bool operator==(const Wire &right) const = default;
+
+    // 重载逻辑运算符 方便构造 monitor
+    Wire operator&&(const Wire &right) const { return Wire(this->signal && right.signal); }
+    Wire operator||(const Wire &right) const { return Wire(this->signal || right.signal); }
+    Wire operator!() const { return Wire(!this->signal); }
+    Wire operator^(const Wire &right) const { return Wire(this->signal != right.signal); }
 };
 
 // 支持fotmat的格式化 以及打印
@@ -330,5 +337,35 @@ std::unique_ptr<std::remove_cv_t<std::remove_reference_t<T>>> make_gate(std::ini
     ptr->add_both_wire(input_list, output_list);
     return ptr; // 直接返回ptr，不需要std::move
 }
+
+// monitor，仅仅用来逻辑上监视电路，但是不执行任何的实际功能
+// 传入一个 lambda 函数，函数打印的时候会返回 lambda表达式当前的值
+// 从而完成了用户可以在外部定义 monitor 的功能
+// 返回的类型是 Wire 统一 省的重写format了
+template <typename Func>
+// 两者等价 但是下面的更短
+//    requires std::is_invocable_v<Func> && std::is_same_v<std::invoke_result_t<Func>, Wire>
+    requires std::is_invocable_r_v<Wire, Func>
+class Monitor {
+  private:
+    Func func;
+
+  public:
+    explicit Monitor(Func &&func_) : func(std::move(func_)) {}
+    explicit Monitor(Func &func_) : func(func_) {}
+    Wire operator()() const { return func(); }
+};
+
+// Monitor的format支持
+// fmt 的format需要正确的继承和是的format函数 写错了就找不到函数在哪了
+template <typename Func>
+struct fmt::formatter<Monitor<Func>> : fmt::formatter<Wire> {
+    // 使用基础类型 bool 的格式化器作为基础
+    template <typename FormatContext>
+    auto format(const Monitor<Func> &monitor, FormatContext &ctx) -> decltype(ctx.out()) {
+        Wire wire = monitor();
+        return fmt::formatter<Wire>::format(wire, ctx);
+    }
+};
 
 #endif //_LOGIC_SIMULATOR__H_
