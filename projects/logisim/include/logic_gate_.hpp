@@ -1,84 +1,14 @@
 //
-// Created by stellaura on 29/02/24.
+// Created by stellaura on 04/03/24.
 //
 
-#ifndef _LOGIC_SIMULATOR__H_
-#define _LOGIC_SIMULATOR__H_
+#ifndef _LOGIC_GATE_H_
+#define _LOGIC_GATE_H_
 
-#include "fmt/format.h"
-#include <cassert>
-#include <chrono>
-#include <limits>
-#include <memory>
+#include "logic_basic_.hpp"
 #include <stdexcept>
-#include <thread>
-#include <type_traits>
-#include <utility>
 #include <vector>
-
-// 只有一个bool值的导线
-// 事实上就是电路中的一个点 (导线上的所有电压都一样 抽象成一个点)
-class Wire {
-  public:
-    bool signal;
-    explicit Wire(bool b) : signal(b){};
-    Wire() : Wire(false){};
-    Wire &operator=(const Wire &right) = default;
-    bool operator==(const Wire &right) const = default;
-
-    // 重载逻辑运算符 方便构造 monitor
-    Wire operator&&(const Wire &right) const { return Wire(this->signal && right.signal); }
-    Wire operator||(const Wire &right) const { return Wire(this->signal || right.signal); }
-    Wire operator!() const { return Wire(!this->signal); }
-    Wire operator^(const Wire &right) const { return Wire(this->signal != right.signal); }
-};
-
-// Wire 的fotmat的格式化
-template <>
-struct fmt::formatter<Wire> : fmt::formatter<int> {
-    // 使用基础类型 bool 的格式化器作为基础
-    template <typename FormatContext>
-    auto format(const Wire &w, FormatContext &ctx) -> decltype(ctx.out()) {
-        // 直接使用 bool 的格式化功能
-        return fmt::formatter<int>::format(w.signal, ctx);
-    }
-};
-
-// 抽象类，表示所有电路设备的共同基类
-class Device {
-  protected:
-    //
-    bool is_state_changed = true;
-
-  public:
-    virtual void update() = 0;   // 纯虚函数，强制要求子类实现
-    virtual ~Device() = default; // 虚析构函数，确保子类能正确析构
-
-    [[nodiscard]] bool has_state_changed() const { return is_state_changed; }
-};
-
-// FlipFlop触发器 (D 触发器)
-// Q* = D
-class DFlipFlop : public Device {
-  public:
-    DFlipFlop(Wire *in_, Wire *out_) : in(in_), out(out_), pre_in(*in_), pre_out(*out_) {}
-    void update() override {
-        out->signal = in->signal;
-        if (*in == pre_in && *out == pre_out) {
-            is_state_changed = false;
-        } else {
-            is_state_changed = true;
-        }
-        pre_in = *in;
-        pre_out = *out;
-    }
-
-  private:
-    Wire *in;
-    Wire *out;
-    Wire pre_in;
-    Wire pre_out;
-};
+#include <memory>
 
 class Gate : public Device {
   private:
@@ -140,8 +70,8 @@ class Gate : public Device {
         (outputs.push_back(args), ...);
     }
 
-    // 通过初始化列表 同时添加输入和输出导线
-    void add_both_wire(std::initializer_list<Wire *> input_list, std::initializer_list<Wire *> output_list) {
+    // 同时添加输入和输出导线
+    void add_both_wire(std::vector<Wire *> input_list, std::vector<Wire *> output_list) {
         for (auto input : input_list) {
             inputs.push_back(input);
         }
@@ -286,88 +216,15 @@ class NotGate : public Gate {
     }
 };
 
-template <typename Container>
-concept IterableContainer = requires(Container c) {
-    { std::begin(c) } -> std::forward_iterator;
-    { std::end(c) } -> std::forward_iterator;
-};
-
-template <typename Container>
-concept DevicePointerContainer = IterableContainer<Container> && requires {
-    typename Container::value_type;
-    requires std::same_as<typename Container::value_type, Device *> ||
-                 std::same_as<typename Container::value_type, std::unique_ptr<Device>>;
-};
-
-// 执行函数 模拟执行电路
-template <typename FlipFlopContainer, typename GateContainer, typename Func>
-    requires std::is_invocable_v<Func> && std::same_as<std::invoke_result_t<Func>, void> &&
-             DevicePointerContainer<FlipFlopContainer> && DevicePointerContainer<GateContainer>
-void start_simulation(FlipFlopContainer &flip_flop_devices, GateContainer &gate_devices, Func func,
-                      std::size_t millisecond = 1000,
-                      std::size_t max_iter_times = std::numeric_limits<std::size_t>::max() - 1) {
-    bool anyUpdated = false;
-    std::size_t max_iter;
-    while (max_iter < max_iter_times) {
-        // update flip flop
-        for (auto &device : flip_flop_devices) {
-            device->update();
-        }
-
-        // update gate circuit
-        do {
-            anyUpdated = false;
-            for (auto &device : gate_devices) {
-                device->update(); // 多态调用
-                if (device->has_state_changed()) {
-                    anyUpdated = true;
-                }
-            }
-        } while (anyUpdated);
-        func();
-        std::this_thread::sleep_for(std::chrono::milliseconds(millisecond));
-        max_iter++;
-    }
-}
-
 // 可以直接构建 获得门电路的 unique_pointer
 template <typename T>
     requires std::is_base_of_v<Gate, std::remove_cv_t<std::remove_reference_t<T>>>
-std::unique_ptr<std::remove_cv_t<std::remove_reference_t<T>>> make_gate(std::initializer_list<Wire *> input_list,
-                                                                        std::initializer_list<Wire *> output_list) {
+std::unique_ptr<std::remove_cv_t<std::remove_reference_t<T>>> make_gate(std::vector<Wire *> input_list,
+                                                                        std::vector<Wire *> output_list) {
     auto ptr = std::make_unique<std::remove_cv_t<std::remove_reference_t<T>>>();
     ptr->add_both_wire(input_list, output_list);
     return ptr; // 直接返回ptr，不需要std::move
 }
 
-// monitor，仅仅用来逻辑上监视电路，但是不执行任何的实际功能
-// 传入一个 lambda 函数，函数打印的时候会返回 lambda表达式当前的值
-// 从而完成了用户可以在外部定义 monitor 的功能
-// 返回的类型是 Wire 统一 省的重写format了
-template <typename Func>
-// 两者等价 但是下面的更短
-//    requires std::is_invocable_v<Func> && std::is_same_v<std::invoke_result_t<Func>, Wire>
-    requires std::is_invocable_r_v<Wire, Func>
-class Monitor {
-  private:
-    Func func;
 
-  public:
-    explicit Monitor(Func &&func_) : func(std::move(func_)) {}
-    explicit Monitor(Func &func_) : func(func_) {}
-    Wire operator()() const { return func(); }
-};
-
-// Monitor的format支持
-// fmt 的format需要正确的继承和是的format函数 写错了就找不到函数在哪了
-template <typename Func>
-struct fmt::formatter<Monitor<Func>> : fmt::formatter<Wire> {
-    // 使用基础类型 bool 的格式化器作为基础
-    template <typename FormatContext>
-    auto format(const Monitor<Func> &monitor, FormatContext &ctx) -> decltype(ctx.out()) {
-        Wire wire = monitor();
-        return fmt::formatter<Wire>::format(wire, ctx);
-    }
-};
-
-#endif //_LOGIC_SIMULATOR__H_
+#endif //_LOGIC_GATE_H_

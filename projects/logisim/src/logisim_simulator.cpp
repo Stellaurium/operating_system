@@ -3,7 +3,7 @@
 //
 // #include "catch2/catch_all.hpp"
 #include "fmt/format.h"
-#include "logic_simulator_.h"
+#include "logisim.hpp"
 #include <memory>
 
 void jyy_example() {
@@ -57,7 +57,7 @@ void jyy_example() {
     };
 
     // 执行代码
-    start_simulation(flip_flop_devices, gate_devices, print_func);
+    start_simulation_with_container(flip_flop_devices, gate_devices, print_func);
 }
 
 void eight_numbers_example() {
@@ -115,7 +115,53 @@ void eight_numbers_example() {
     };
 
     // 执行
-    start_simulation(flip_flop_devices, gate_devices, print_func);
+    start_simulation_with_container(flip_flop_devices, gate_devices, print_func);
+}
+
+// 再封装的这层其实意义不大
+void easy_way() {
+    LogicSimulator logic_simulator{10};
+
+    logic_simulator.add_flip_flop<DFlipFlop>(0, 1);
+    logic_simulator.add_flip_flop<DFlipFlop>(2, 3);
+    logic_simulator.add_flip_flop<DFlipFlop>(7, 6);
+
+    logic_simulator.add_gate<NotGate>(std::vector<std::size_t>{1}, std::vector<std::size_t>{0});
+    logic_simulator.add_gate<XorGate>(std::vector<std::size_t>{1, 3}, std::vector<std::size_t>{2});
+    logic_simulator.add_gate<NotGate>(std::vector<std::size_t>{3}, std::vector<std::size_t>{4});
+    logic_simulator.add_gate<AndGate>(std::vector<std::size_t>{4, 6}, std::vector<std::size_t>{5});
+    logic_simulator.add_gate<XorGate>(std::vector<std::size_t>{1, 6}, std::vector<std::size_t>{9});
+    logic_simulator.add_gate<AndGate>(std::vector<std::size_t>{3, 9}, std::vector<std::size_t>{8});
+    logic_simulator.add_gate<OrGate>(std::vector<std::size_t>{5, 8}, std::vector<std::size_t>{7});
+
+    // 输出电路
+    Wire &q1{logic_simulator.array_ptr[1]};
+    Wire &q2{logic_simulator.array_ptr[3]};
+    Wire &q3{logic_simulator.array_ptr[6]};
+
+    // ~a~c + ac + b
+    Monitor a{[&]() { return q2 || !(q1 ^ q3); }};
+    // ~b~c + bc + ~a
+    Monitor b{[&]() { return !((q3) && (q1 ^ q2)); }};
+    // ~b + c + a
+    Monitor c{[&]() { return q3 || !(q2) || q1; }};
+    // a~bc + ~a~c + ~ab + b~c
+    Monitor d{[&]() { return q3 && !q2 && q1 || !q3 && !q1 || !q3 && q2 || q2 && !q1; }};
+    // ~a~c + b~c
+    Monitor e{[&]() { return !(q1) && (q2 || !(q3)); }};
+    // ~b~c + a~b + a~c
+    Monitor f{[&]() { return (!(q2) && !(q1)) || (q3 && (!(q2) || !(q1))); }};
+    // ~ab + a~b + b~c
+    Monitor g{[&]() { return (q2 ^ q3) || (q2 && !(q1)); }};
+
+    auto print_func = [&]() {
+        fmt::println("A = {}; B = {}; C = {}; D = {}; E = {}; F = {}; G = {};", a, b, c, d, e, f, g);
+        //        fmt::println("Q3 = {}; Q2 = {}; Q1 = {};", q3, q2, q1);
+        // 一定要刷新以下缓冲区 不然会卡着什么都没有
+        fflush(stdout);
+    };
+
+    logic_simulator.start_simulation(print_func);
 }
 
 // TEST_CASE("test for jyy example", "[test]") { jyy_example(); }
@@ -123,6 +169,6 @@ void eight_numbers_example() {
 // TEST_CASE("test for the 0-7 clock circuit which I designed", "[extend]") { eight_numbers_example(); }
 
 int main() {
-    eight_numbers_example();
+    easy_way();
     return 0;
 }
