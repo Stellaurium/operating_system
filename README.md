@@ -29,7 +29,7 @@
 
 ## 项目格式
 
-`~/Programs/course/operating_system/operating_system_jyy_base`: 原始的ftp根目录结构 原始文件 没有任何修改
+`~/Programs/course/operating_system/operating_system_jyy/operating_system_jyy_source`: 原始的ftp根目录结构 原始文件 没有任何修改
 
 `~/Programs/course/operating_system/operating_system_jyy`: 自己拿回来重新写的项目 使用 cmake + c++
 

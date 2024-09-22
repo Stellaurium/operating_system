@@ -17,6 +17,11 @@ TEMPLATE = '''
 # \033[颜色码m 表示更改颜色
 # \033[0m     表示恢复默认
 # These are ANSI Escape Codes
+# 033=27=0x1B 是ASCII的 ESC
+# 1-26 都是 ctrl+abcd对应的字母，ESC是然后第一个
+# 在你给计算机发送 ESC 时，确实是ESC
+# 但是计算机给你发送 ESC 时，表示转义 (可能是计算机应该不会向你发送这个字符)
+# 转移序列都是以 ESC[开头，然后中间是参数，最后是一个字母表示命令的种类
 CLEAR = '\033[2J\033[1;1f'  # Clear screen and move cursor to top-left
 WHITE = '\033[37m░\033[0m'  # A hollow block (White)
 BLACK = '\033[31m█\033[0m'  # A solid block  (Red)
