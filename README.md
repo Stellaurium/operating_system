@@ -10,6 +10,8 @@
 
 ## 对于代码下载
 
+### 过时内容
+
 点击 课程ppt界面(vscode类似的前端课程界面)
 会获得 类似于 `ftp://jyywiki.cn/os/introduction/mini-rv32ima/`
 之类的fpt地址
@@ -27,11 +29,22 @@
 
 ~~直接wget要么无限循环 要么卡住~~
 
+### 当前方式
+在2024年9月22号，在用ubuntu更新了证书之后，再添加上`--no-check-certificate`就可以正常使用了。
+
+```
+sudo apt install ca-certificates
+sudo update-ca-certificates
+```
+
+通过这个方式，可以下载整个jyy wiki里的内容，相当多
+
+
 ## 项目格式
 
-`~/Programs/course/operating_system/operating_system_jyy/operating_system_jyy_source`: 原始的ftp根目录结构 原始文件 没有任何修改
+`~/Programs/course/operating_system_jyy/os-demos`: 直接从网站上wget了全部的内容，没有任何修改
 
-`~/Programs/course/operating_system/operating_system_jyy`: 自己拿回来重新写的项目 使用 cmake + c++
+`~/Programs/course/operating_system_jyy`: 自己拿回来重新写的项目 使用 cmake + c++
 
 ## 目录结构
 

@@ -126,13 +126,13 @@ void easy_way() {
     logic_simulator.add_flip_flop<DFlipFlop>(2, 3);
     logic_simulator.add_flip_flop<DFlipFlop>(7, 6);
 
-    logic_simulator.add_gate<NotGate>(std::vector<std::size_t>{1}, std::vector<std::size_t>{0});
-    logic_simulator.add_gate<XorGate>(std::vector<std::size_t>{1, 3}, std::vector<std::size_t>{2});
-    logic_simulator.add_gate<NotGate>(std::vector<std::size_t>{3}, std::vector<std::size_t>{4});
-    logic_simulator.add_gate<AndGate>(std::vector<std::size_t>{4, 6}, std::vector<std::size_t>{5});
-    logic_simulator.add_gate<XorGate>(std::vector<std::size_t>{1, 6}, std::vector<std::size_t>{9});
-    logic_simulator.add_gate<AndGate>(std::vector<std::size_t>{3, 9}, std::vector<std::size_t>{8});
-    logic_simulator.add_gate<OrGate>(std::vector<std::size_t>{5, 8}, std::vector<std::size_t>{7});
+    logic_simulator.add_gate<NotGate>({1}, {0});
+    logic_simulator.add_gate<XorGate>({1, 3}, {2});
+    logic_simulator.add_gate<NotGate>({3}, {4});
+    logic_simulator.add_gate<AndGate>({4, 6}, {5});
+    logic_simulator.add_gate<XorGate>({1, 6}, {9});
+    logic_simulator.add_gate<AndGate>({3, 9}, {8});
+    logic_simulator.add_gate<OrGate>({5, 8}, {7});
 
     // 输出电路
     Wire &q1{logic_simulator.array_ptr[1]};

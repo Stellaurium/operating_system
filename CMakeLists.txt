@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.22)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_COMPILER gcc)
 set(CMAKE_CXX_COMPILER g++)
@@ -25,7 +25,7 @@ include_directories(${PROJECT_INCLUDE_DIRS})
 
 # =====================================================================================
 # 需要排除的目录名称
-set(EXCLUDED_DIRECTORIES "mini-rv32ima" "tar" "compiler-opt" "hanoi" "strace" "minimal")
+set(EXCLUDED_DIRECTORIES "mini-rv32ima" "tar" "compiler-opt" "hanoi" "strace" "minimal" "mosaic")
 # =====================================================================================
 
 
