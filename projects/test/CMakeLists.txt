@@ -20,4 +20,3 @@ target_link_libraries(test Catch2::Catch2WithMain)
 # # target_link_libraries(test Boost::boost) # 不明原因 Boost::boost 不能使用
 target_link_libraries(test ${Boost_LIBRARIES})
 #target_link_libraries(test spdlog::spdlog)
-#target_link_libraries(test plf_colony::plf_colony)

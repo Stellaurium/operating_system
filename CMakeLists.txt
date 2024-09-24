@@ -17,7 +17,6 @@ find_package(fmt REQUIRED)
 find_package(Catch2 REQUIRED)
 find_package(Boost REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(plf_colony REQUIRED)
 
 
 include_directories(${PROJECT_INCLUDE_DIRS})
@@ -25,7 +24,7 @@ include_directories(${PROJECT_INCLUDE_DIRS})
 
 # =====================================================================================
 # 需要排除的目录名称
-set(EXCLUDED_DIRECTORIES "mini-rv32ima" "tar" "compiler-opt" "hanoi" "strace" "minimal" "mosaic")
+set(EXCLUDED_DIRECTORIES "compiler-opt" "strace" "minimal" "mosaic")
 # =====================================================================================
 
 
