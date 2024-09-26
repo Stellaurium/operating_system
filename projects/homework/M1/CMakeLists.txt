@@ -1,4 +1,4 @@
-set(project_name hanoi)
+set(project_name M1-pstree)
 project(${project_name})
 
 # 获取当前文件夹的名称 然后放到build/bin目录下面的对应文件夹里面
@@ -10,6 +10,10 @@ set(SUBPROJECT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${SUBPROJECT_INCLUDE_DIRS})
 
 
-add_executable(${project_name} src/hanoi_main.cpp)
+file(GLOB_RECURSE source_files ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+
+add_executable(${project_name} ${source_files})
+
+# 添加依赖
 target_link_libraries(${project_name} fmt::fmt)
 target_link_libraries(${project_name} Catch2::Catch2WithMain)

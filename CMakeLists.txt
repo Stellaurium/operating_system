@@ -29,18 +29,22 @@ set(EXCLUDED_DIRECTORIES "compiler-opt" "strace" "minimal" "mosaic")
 
 
 # 获取所有子项目的目录
-file(GLOB SUB_PROJECTS "${PROJECT_SOURCE_DIR}/projects/*")
+file(GLOB SECTIONS "${PROJECT_SOURCE_DIR}/projects/*")
 
-# 遍历每个子项目并添加
-foreach(SUB_PROJECT ${SUB_PROJECTS})
-    if(IS_DIRECTORY ${SUB_PROJECT})
-        # 获取最后一个/后的名称 方便使用 EXCLUDED_DIRECTORIES 进行排除
-        get_filename_component(LAST_PART ${SUB_PROJECT} NAME)
-        if(NOT ${LAST_PART} IN_LIST EXCLUDED_DIRECTORIES)
-            add_subdirectory(${SUB_PROJECT})
-        endif()
-    endif()
-endforeach()
-
-
+# 遍历每个项目并添加
+foreach (SECTION ${SECTIONS})
+    if (IS_DIRECTORY ${SECTION})
+        # 获取每个项目中的二级目录
+        file(GLOB SUB_PROJECTS "${SECTION}/*")
+        foreach (SUB_PROJECT ${SUB_PROJECTS})
+            if (IS_DIRECTORY ${SUB_PROJECT})
+                # 获取最后一个/后的名称 方便使用 EXCLUDED_DIRECTORIES 进行排除
+                get_filename_component(LAST_PART ${SUB_PROJECT} NAME)
+                if (NOT ${LAST_PART} IN_LIST EXCLUDED_DIRECTORIES)
+                    add_subdirectory(${SUB_PROJECT})
+                endif ()
+            endif ()
+        endforeach ()
+    endif ()
+endforeach ()
 

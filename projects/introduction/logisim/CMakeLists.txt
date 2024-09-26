@@ -6,7 +6,7 @@ get_filename_component(CURRENT_FOLDER_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 set(EXECUTABLE_OUTPUT_PATH ${ROOT_EXECUTABLE_OUTPUT_PATH}/${CURRENT_FOLDER_NAME})
 
 # 如果有 设置 sub project 的私有的include的文件夹
-set(SUBPROJECT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(SUBPROJECT_INCLUDE_DIRS include)
 include_directories(${SUBPROJECT_INCLUDE_DIRS})
 
 
@@ -22,7 +22,7 @@ target_link_libraries(logisim fmt::fmt)
 
 # 定义一个自定义目标来运行logisim
 add_custom_target(run_logisim
-        COMMAND ${EXECUTABLE_OUTPUT_PATH}/logisim | ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/seg-display.py
+        COMMAND ${EXECUTABLE_OUTPUT_PATH}/logisim | ${PYTHON_EXECUTABLE} src/seg-display.py
 #        DEPENDS 的文件是 add_executable编译出来的可执行文件，需要保证编译出来了之后 再调用这个命令
         DEPENDS logisim
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
