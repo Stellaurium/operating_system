@@ -62,26 +62,31 @@ private:
     while (count < length) {
       std::string next_begin = begin;
 
+      // 不是第一个就打印prefix找齐
       if (count != 0) {
         fmt::print("{}", begin);
       }
 
+      // 最后一个就让下面找齐的为空
+      if(count == length - 1){
+        next_begin += "   ";
+      }
+      else{
+        next_begin += " │ ";
+      }
+
       // only one child
       if (length == 1 && count == 0) {
-        next_begin += "   ";
         fmt::print("───");
       }
       // first child
       else if (count == 0) {
-        next_begin += " │ ";
         fmt::print("─┬─");
       }
       // last child
       else if (count == length - 1) {
-        next_begin += " │ ";
         fmt::print(" └─");
       } else {
-        next_begin += " │ ";
         fmt::print(" ├─");
       }
 
@@ -109,6 +114,15 @@ public:
 
   void insert(int pid, int ppid, std::string name) {
     node_map[pid] = Node{pid, ppid, name};
+    parent_map[ppid].push_back(pid);
+  }
+
+  template <typename U>
+    requires std::is_same_v<std::decay_t<U>, Node>
+  void insert(U &&node) {
+    int pid = node.pid;
+    int ppid = node.ppid;
+    node_map[pid] = std::forward<U>(node);
     parent_map[ppid].push_back(pid);
   }
 
