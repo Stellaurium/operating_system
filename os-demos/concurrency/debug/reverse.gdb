@@ -1,5 +1,5 @@
 define hook-stop
-    print a
+    print_tab a
 end
 start
 target record-full

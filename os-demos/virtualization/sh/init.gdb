@@ -8,7 +8,7 @@ tui disable
 skip function strlen
 skip function strcpy
 skip function strchr
-skip function print
+skip function print_tab
 skip function zalloc
 skip function peek
 skip function gettoken

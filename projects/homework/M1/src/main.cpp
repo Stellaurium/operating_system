@@ -1,33 +1,40 @@
 //
 // Created by stellaura on 25/09/24.
 //
-#include "ordered_list.h"
+#include "tree.h"
 
 #include <catch2/catch_all.hpp>
 #include <fmt/format.h>
 
-TEST_CASE("ordered list") {
-  fmt::println("ordered list:");
+template <typename T>
+using MultisetOrderedList = std::multiset<T>;
 
-  OrderedList<int> list;
-  list.insert(10);
-  list.insert(4);
-  list.insert(2);
-  list.insert(5);
-  for (auto it = list.begin(); it != list.end(); it++) {
-    fmt::println("{}",*it);
-  }
-  for(auto e:list){
-    fmt::println("{}",e);
-  }
+
+TEST_CASE("tree") {
+  fmt::println("=======================\ntree:");
+  Tree tree;
+  tree.insert(3,0,"first app");
+  tree.insert(4,3,"2 A");
+  tree.insert(11,4,"3 D");
+  tree.insert(10,4,"3 E");
+  tree.insert(6,3,"2 C");
+  tree.insert(5,3,"2 B");
+  tree.insert(14,0,"second app");
+
+  fmt::println("normal:");
+  tree.print_utf8();
+
+//  fmt::println("=======================\nsorted by name:");
+//  tree.sort([](const Node &a, const Node &b) { return a.name < b.name; });
+//  tree.print_utf8();
+//
+//  fmt::println("=======================\nsorted by pid:");
+//  tree.sort([](const Node &a, const Node &b) { return a.pid < b.pid; });
+//  tree.print_utf8();
 }
-
-TEST_CASE("tree") { fmt::println("tree:"); }
-
-TEST_CASE("print tree format") { fmt::println("print tree format:"); }
 
 TEST_CASE("proc pid status information") {
   fmt::println("proc pid status information:");
 }
 
-TEST_CASE("print pstree") { fmt::println("print pstree:"); }
+TEST_CASE("print_tab pstree") { fmt::println("print_tab pstree:"); }
