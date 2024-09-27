@@ -12,12 +12,15 @@ include_directories(${SUBPROJECT_INCLUDE_DIRS})
 
 file(GLOB_RECURSE source_files ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 list(REMOVE_ITEM source_files
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/M1-test.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/M1-main.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/test.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/stress_test.cpp
+        )
 
 
-add_executable(test_${project_name} ${source_files} ${CMAKE_CURRENT_SOURCE_DIR}/src/M1-test.cpp)
-add_executable(${project_name} ${source_files} ${CMAKE_CURRENT_SOURCE_DIR}/src/M1-main.cpp)
+add_executable(test_${project_name} ${source_files} ${CMAKE_CURRENT_SOURCE_DIR}/src/test.cpp)
+add_executable(${project_name} ${source_files} ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
+add_executable(stress_test_${project_name} ${CMAKE_CURRENT_SOURCE_DIR}/src/stress_test.cpp)
 
 # 添加依赖
 target_link_libraries(test_${project_name} fmt::fmt)

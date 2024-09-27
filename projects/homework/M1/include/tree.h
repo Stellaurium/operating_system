@@ -104,6 +104,10 @@ public:
   Tree() { node_map[0] = Node{0, -1, "root"}; }
 
   void insert(int pid, int ppid, std::string name) {
+    // 
+    if (pid == 0)
+      return;
+
     node_map[pid] = Node{pid, ppid, name};
     parent_map[ppid].push_back(pid);
   }

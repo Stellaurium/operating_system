@@ -7,15 +7,16 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <optional>
 
 namespace fs = std::filesystem;
 
-Node parse_status(const fs::path &path) {
+std::optional<Node> parse_status(const fs::path &path) {
   Node node;
   std::ifstream file{path};
 
   if (!file.is_open()) {
-    throw std::runtime_error("无法打开文件: " + path.string());
+    return std::nullopt;
   }
 
   std::string line;
@@ -44,8 +45,11 @@ Tree traverse_proc() {
       // 拼接出 status 文件的路径
       fs::path status_path = entry.path() / "status";
       auto ret = parse_status(status_path);
-      tree.insert(std::move(ret));
+      if (ret) {
+        tree.insert(std::move(*ret));
+      }
     }
   }
+
   return tree;
 }
