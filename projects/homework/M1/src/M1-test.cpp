@@ -1,7 +1,7 @@
 //
 // Created by stellaura on 25/09/24.
 //
-#include "proc_travesal.h"
+#include "proc_traversal.h"
 #include "tree.h"
 
 #include <catch2/catch_all.hpp>
@@ -23,22 +23,15 @@ TEST_CASE("tree") {
   tree.insert(14, 0, "second app");
 
   fmt::println("normal:");
-  tree.print_utf8();
+  tree.print();
 
   fmt::println("=======================\nsorted by name:");
   tree.sort([](const Node &a, const Node &b) { return a.name < b.name; });
-  tree.print_utf8();
+  tree.print();
 
   fmt::println("=======================\nsorted by pid:");
   tree.sort([](const Node &a, const Node &b) { return a.pid < b.pid; });
-  tree.print_utf8();
-}
-
-TEST_CASE("proc pid status information") {
-  fmt::println("proc pid status information:");
-  fs::path p{"/tmp/1.txt"};
-  auto node = parse_status(p);
-  fmt::println("name:{}\tpid:{}\tppid:{}", node.name, node.pid, node.ppid);
+  tree.print(true);
 }
 
 TEST_CASE("proc traversal and print") {

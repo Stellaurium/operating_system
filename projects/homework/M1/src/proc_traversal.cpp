@@ -1,7 +1,7 @@
 //
 // Created by stellaura on 26/09/24.
 //
-#include "proc_travesal.h"
+#include "proc_traversal.h"
 #include "tree.h"
 
 #include <algorithm>
@@ -20,11 +20,11 @@ Node parse_status(const fs::path &path) {
 
   std::string line;
   while (std::getline(file, line)) {
-    if (line.rfind("Name:", 0) == 0) {
+    if (line.find("Name:", 0) == 0) {
       node.name = line.substr(6); // 去掉 "Name:" 部分
-    } else if (line.rfind("Pid:", 0) == 0) {
+    } else if (line.find("Pid:", 0) == 0) {
       node.pid = std::stoi(line.substr(5)); // 转换为整数
-    } else if (line.rfind("PPid:", 0) == 0) {
+    } else if (line.find("PPid:", 0) == 0) {
       node.ppid = std::stoi(line.substr(6)); // 转换为整数
     }
   }

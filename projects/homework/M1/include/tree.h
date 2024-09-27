@@ -27,25 +27,17 @@ private:
   std::map<int, Node> node_map;
   std::map<int, std::list<int>> parent_map;
 
-  void print_tab_(int pid, int level = 0) {
+  void print_utf8_(int pid, bool is_print_pid, std::string begin = "") {
     const auto &node = node_map[pid];
-    if (pid != 0) {
-      for (int i = 0; i < level; i++) {
-        fmt::print("    ");
-      }
-      fmt::println("{}({})", node.name, node.pid);
-    }
-    for (auto children_pid : parent_map[pid]) {
-      print_tab_(children_pid, level + 1);
-    }
-  }
-
-  void print_utf8_(int pid, std::string begin = "") {
-    const auto &node = node_map[pid];
-    fmt::print("{}({})", node.name, node.pid);
-
+    fmt::print("{}", node.name);
     // 对齐开头
-    int space_count = node.name.length() + count_digits_(pid) + 2;
+    int space_count = node.name.length();
+
+    if (is_print_pid) {
+      fmt::print("({})", node.pid);
+      space_count += count_digits_(pid) + 2;
+    }
+
     for (int i = 0; i < space_count; i++) {
       begin += ' ';
     }
@@ -68,10 +60,9 @@ private:
       }
 
       // 最后一个就让下面找齐的为空
-      if(count == length - 1){
+      if (count == length - 1) {
         next_begin += "   ";
-      }
-      else{
+      } else {
         next_begin += " │ ";
       }
 
@@ -90,7 +81,7 @@ private:
         fmt::print(" ├─");
       }
 
-      print_utf8_(*it, next_begin);
+      print_utf8_(*it, is_print_pid, next_begin);
 
       it++;
       count++;
@@ -145,7 +136,5 @@ public:
     }
   }
 
-  void print_tab() { print_tab_(0, -1); }
-  void print_utf8() { print_utf8_(0, ""); }
-  void print() { print_utf8(); }
+  void print(bool is_print_pid = false) { print_utf8_(0, is_print_pid, ""); }
 };
